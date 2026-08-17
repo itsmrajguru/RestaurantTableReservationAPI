@@ -64,6 +64,21 @@ public static class DataSeeder
             });
         }
 
+        if(!await context.OperatingHours.AnyAsync())
+        {
+            var operatingHours=new List<OperatingHours>
+            {
+                new OperatingHours { DayOfWeek=DayOfWeek.Sunday, IsClosed=true },
+                new OperatingHours { DayOfWeek=DayOfWeek.Monday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
+                new OperatingHours { DayOfWeek=DayOfWeek.Tuesday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
+                new OperatingHours { DayOfWeek=DayOfWeek.Wednesday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
+                new OperatingHours { DayOfWeek=DayOfWeek.Thursday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
+                new OperatingHours { DayOfWeek=DayOfWeek.Friday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(23,0), IsClosed=false },
+                new OperatingHours { DayOfWeek=DayOfWeek.Saturday, OpeningTime=new TimeOnly(9,0), ClosingTime=new TimeOnly(23,0), IsClosed=false }
+            };
+            context.OperatingHours.AddRange(operatingHours);
+        }
+
         await context.SaveChangesAsync();
     }
 }

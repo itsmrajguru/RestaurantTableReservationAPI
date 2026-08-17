@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<TimeSlot> TimeSlots { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<RestaurantConfiguration> RestaurantConfigurations { get; set; }
+    public DbSet<OperatingHours> OperatingHours { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +22,10 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<OperatingHours>()
+            .HasIndex(o => o.DayOfWeek)
             .IsUnique();
 
         modelBuilder.Entity<RestaurantTable>()

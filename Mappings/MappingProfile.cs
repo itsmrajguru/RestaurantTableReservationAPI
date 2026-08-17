@@ -36,5 +36,17 @@ public class MappingProfile : Profile
         // RestaurantConfiguration Mappings
         CreateMap<RestaurantConfiguration, RestaurantConfigResponseDto>();
         CreateMap<UpdateRestaurantConfigDto, RestaurantConfiguration>();
+
+        // OperatingHours Mappings
+        CreateMap<OperatingHours, OperatingHoursResponseDto>()
+            .ForMember(dest => dest.DayOfWeek, opt => opt.MapFrom(src => src.DayOfWeek.ToString()))
+            .ForMember(dest => dest.OpeningTime, opt => opt.MapFrom(src => src.OpeningTime.HasValue ? src.OpeningTime.Value.ToString("HH:mm") : null))
+            .ForMember(dest => dest.ClosingTime, opt => opt.MapFrom(src => src.ClosingTime.HasValue ? src.ClosingTime.Value.ToString("HH:mm") : null));
+            
+        CreateMap<UpdateOperatingHoursDto, OperatingHours>()
+            .ForMember(dest => dest.OpeningTime, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.OpeningTime) ? (TimeOnly?)null : TimeOnly.Parse(src.OpeningTime)))
+            .ForMember(dest => dest.ClosingTime, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.ClosingTime) ? (TimeOnly?)null : TimeOnly.Parse(src.ClosingTime)))
+            .ForMember(dest => dest.DayOfWeek, opt => opt.Ignore()) // Cannot update the day
+            .ForMember(dest => dest.Id, opt => opt.Ignore()); // Cannot update the id
     }
 }

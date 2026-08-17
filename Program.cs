@@ -23,12 +23,14 @@ builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IRestaurantConfigRepository, RestaurantConfigRepository>();
+builder.Services.AddScoped<IOperatingHoursRepository, OperatingHoursRepository>();
 
 // Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<ITimeSlotService, TimeSlotService>();
 builder.Services.AddScoped<IRestaurantConfigService, RestaurantConfigService>();
+builder.Services.AddScoped<IOperatingHoursService, OperatingHoursService>();
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
