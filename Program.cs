@@ -1,8 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using RestaurantTableReservationAPI.Data;
+
 //the app builder registers services into the DI
 var builder = WebApplication.CreateBuilder(args);
 
 //app builder says to the asp.NET core, that i'm using these controllers
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -17,6 +23,14 @@ builder.Services.AddSwaggerGen(options =>
 
 //this actually builds the app
 var app = builder.Build();
+
+// Run DB migrations and seed data on startup
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(context);
+}
 
 if (app.Environment.IsDevelopment())
 {
