@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RestaurantTableReservationAPI.Data;
+using RestaurantTableReservationAPI.Filters;
 using RestaurantTableReservationAPI.Repositories;
 using RestaurantTableReservationAPI.Repositories.Interfaces;
 using RestaurantTableReservationAPI.Services;
@@ -71,12 +72,15 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name="Authorization",
-        Type=Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Type=Microsoft.OpenApi.Models.SecuritySchemeType.Http,
         Scheme="Bearer",
         BearerFormat="JWT",
         In=Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description="Enter 'Bearer' [space] and then your token.\nExample: Bearer eyJhb..."
+        Description="**Authorization Configuration:**\n\nPlease enter ONLY your JWT token below. You no longer need to type the word 'Bearer'.\n\nDepending on what you are testing, use an **Admin** token or a **Customer** token."
     });
+
+    // Add our custom operation filter to show roles in Swagger UI
+    options.OperationFilter<SwaggerRoleOperationFilter>();
 
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
