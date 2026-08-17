@@ -63,9 +63,9 @@ public class ReservationRepository : IReservationRepository
     {
         // A table is booked if there's a Confirmed or Pending reservation for that table, date, and time slot.
         // Cancelled or NoShow means the table is free.
-        return await _context.Reservations.AnyAsync(r => 
-            r.TableId == tableId && 
-            r.ReservationDate == date && 
+        return await _context.Reservations.AnyAsync(r =>
+            r.TableId == tableId &&
+            r.ReservationDate == date &&
             r.TimeSlotId == timeSlotId &&
             (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed));
     }

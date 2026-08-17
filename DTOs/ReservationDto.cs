@@ -8,13 +8,13 @@ public class ReservationResponseDto
     public int Id { get; set; }
     public int UserId { get; set; }
     public string UserName { get; set; } = string.Empty;
-    
+
     public int TableId { get; set; }
     public string TableNumber { get; set; } = string.Empty;
-    
+
     public int TimeSlotId { get; set; }
     public TimeSpan StartTime { get; set; }
-    
+
     public DateOnly ReservationDate { get; set; }
     public int PartySize { get; set; }
     public string Status { get; set; } = string.Empty;

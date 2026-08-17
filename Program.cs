@@ -1,7 +1,12 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RestaurantTableReservationAPI.Data;
 using RestaurantTableReservationAPI.Repositories;
 using RestaurantTableReservationAPI.Repositories.Interfaces;
+using RestaurantTableReservationAPI.Services;
+using RestaurantTableReservationAPI.Services.Interfaces;
 
 //the app builder registers services into the DI
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +23,34 @@ builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
+// Register Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
+
+// Configure Authentication & JWT
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

@@ -5,6 +5,7 @@ using RestaurantTableReservationAPI.DTOs;
 /* this file is only made to execute the automapper
 so that we dont need to manually copy the model fields into dto fields*/
 namespace RestaurantTableReservationAPI.Mappings;
+
 public class MappingProfile : Profile
 {
     public MappingProfile()
