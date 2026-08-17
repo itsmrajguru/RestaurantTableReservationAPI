@@ -17,6 +17,8 @@ public class MappingProfile : Profile
 
         // TimeSlot Mappings
         CreateMap<TimeSlot, TimeSlotResponseDto>();
+        CreateMap<CreateTimeSlotDto, TimeSlot>();
+        CreateMap<UpdateTimeSlotDto, TimeSlot>();
 
         // Reservation Mappings
         // We use ForMember to flatten nested objects (e.g. mapping r.User.Name to dto.UserName)

@@ -14,13 +14,36 @@ public class TimeSlotRepository : ITimeSlotRepository
         _context = context;
     }
 
-    public async Task<List<TimeSlot>> GetAllAsync()
+    public async Task<List<TimeSlot>> GetAllAsync(bool includeInactive=false)
     {
-        return await _context.TimeSlots.Where(ts => ts.IsActive).OrderBy(ts => ts.StartTime).ToListAsync();
+        var query=_context.TimeSlots.AsQueryable();
+        if(!includeInactive)
+        {
+            query=query.Where(ts=>ts.IsActive);
+        }
+        return await query.OrderBy(ts=>ts.StartTime).ToListAsync();
     }
 
-    public async Task<TimeSlot?> GetByIdAsync(int id)
+    public async Task<TimeSlot?> GetByIdAsync(int id, bool includeInactive=false)
     {
-        return await _context.TimeSlots.FirstOrDefaultAsync(ts => ts.Id == id && ts.IsActive);
+        var query=_context.TimeSlots.AsQueryable();
+        if(!includeInactive)
+        {
+            query=query.Where(ts=>ts.IsActive);
+        }
+        return await query.FirstOrDefaultAsync(ts=>ts.Id==id);
+    }
+
+    public async Task<TimeSlot> AddAsync(TimeSlot timeSlot)
+    {
+        await _context.TimeSlots.AddAsync(timeSlot);
+        await _context.SaveChangesAsync();
+        return timeSlot;
+    }
+
+    public async Task UpdateAsync(TimeSlot timeSlot)
+    {
+        _context.TimeSlots.Update(timeSlot);
+        await _context.SaveChangesAsync();
     }
 }
