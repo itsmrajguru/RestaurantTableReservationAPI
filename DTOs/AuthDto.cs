@@ -31,6 +31,6 @@ public class RegisterCustomerDto
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required!")]
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long!")]
+    [MinLength(4, ErrorMessage = "Password must be at least 4 characters long!")]
     public string Password { get; set; } = string.Empty;
 }
