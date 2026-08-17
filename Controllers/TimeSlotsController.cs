@@ -42,20 +42,31 @@ public class TimeSlotsController : ControllerBase
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> CreateTimeSlot(CreateTimeSlotDto dto)
     {
-        var createdSlot=await _timeSlotService.CreateTimeSlotAsync(dto);
-        if(createdSlot==null) return BadRequest(new{message="Invalid time range. StartTime must be before EndTime."});
-        
-        return CreatedAtAction(nameof(GetTimeSlotById), new{id=createdSlot.Id}, createdSlot);
+        try
+        {
+            var createdSlot=await _timeSlotService.CreateTimeSlotAsync(dto);
+            return CreatedAtAction(nameof(GetTimeSlotById), new{id=createdSlot!.Id}, createdSlot);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
     }
 
     [HttpPut("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> UpdateTimeSlot(int id, UpdateTimeSlotDto dto)
     {
-        var updatedSlot=await _timeSlotService.UpdateTimeSlotAsync(id, dto);
-        if(updatedSlot==null) return BadRequest(new{message="Invalid update request. Verify ID and Time Range."});
-        
-        return Ok(updatedSlot);
+        try
+        {
+            var updatedSlot=await _timeSlotService.UpdateTimeSlotAsync(id, dto);
+            if(updatedSlot==null) return NotFound(new{message="Time slot not found."});
+            return Ok(updatedSlot);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
     }
 
     [HttpDelete("{id}")]
