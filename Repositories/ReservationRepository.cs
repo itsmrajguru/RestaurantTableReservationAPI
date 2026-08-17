@@ -46,6 +46,17 @@ public class ReservationRepository : IReservationRepository
             .ToListAsync();
     }
 
+    public async Task<List<Reservation>> GetAllAsync()
+    {
+        return await _context.Reservations
+            .Include(r => r.User)
+            .Include(r => r.Table)
+            .Include(r => r.TimeSlot)
+            .OrderByDescending(r => r.ReservationDate)
+            .ThenBy(r => r.TimeSlot.StartTime)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(Reservation reservation)
     {
         await _context.Reservations.AddAsync(reservation);

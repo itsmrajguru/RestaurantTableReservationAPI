@@ -34,6 +34,7 @@ builder.Services.AddScoped<IRestaurantConfigService, RestaurantConfigService>();
 builder.Services.AddScoped<IOperatingHoursService, OperatingHoursService>();
 builder.Services.AddScoped<RestaurantTableReservationAPI.Services.Validation.IReservationValidationEngine, RestaurantTableReservationAPI.Services.Validation.ReservationValidationEngine>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));

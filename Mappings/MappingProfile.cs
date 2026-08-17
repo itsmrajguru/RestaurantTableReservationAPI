@@ -23,9 +23,11 @@ public class MappingProfile : Profile
         // Reservation Mappings
         // We use ForMember to flatten nested objects (e.g. mapping r.User.Name to dto.UserName)
         CreateMap<Reservation, ReservationResponseDto>()
-            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.User.Name))
+            .ForMember(dest => dest.CustomerEmail, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.TableNumber, opt => opt.MapFrom(src => src.Table.TableNumber))
             .ForMember(dest => dest.StartTime, opt => opt.MapFrom(src => src.TimeSlot.StartTime))
+            .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.TimeSlot.EndTime))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         CreateMap<CreateReservationDto, Reservation>()
