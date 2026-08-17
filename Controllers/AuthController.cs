@@ -38,43 +38,22 @@ public class AuthController : ControllerBase
     */
     public async Task<IActionResult> Login([FromBody] LoginRequestDto loginDto)
     {
-<<<<<<< HEAD
         var result=await _authService.LoginAsync(loginDto);
         if(result==null)
         {
             return Unauthorized(new{message="Invalid email or password."});
         }
-=======
-        var result = await _authService.LoginAsync(loginDto);
-
-        if (result == null)
-        {
-            return Unauthorized(new { message = "Invalid email or password." });
-        }
-
->>>>>>> 0b0ece213a8d0b5c424456df47fd39ccb027f9a3
         return Ok(result);
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterCustomerDto registerDto)
     {
-<<<<<<< HEAD
         var isSuccess=await _authService.RegisterCustomerAsync(registerDto);
         if(!isSuccess)
         {
             return BadRequest(new{message="Email is already registered."});
         }
         return Ok(new{message="Customer registered successfully."});
-=======
-        var isSuccess = await _authService.RegisterCustomerAsync(registerDto);
-
-        if (!isSuccess)
-        {
-            return BadRequest(new { message = "Email is already registered." });
-        }
-
-        return Ok(new { message = "Customer registered successfully." });
->>>>>>> 0b0ece213a8d0b5c424456df47fd39ccb027f9a3
     }
 }
