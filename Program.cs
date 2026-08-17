@@ -18,6 +18,9 @@ builder.Services.AddScoped<ITableRepository, TableRepository>();
 builder.Services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
+// Register AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
