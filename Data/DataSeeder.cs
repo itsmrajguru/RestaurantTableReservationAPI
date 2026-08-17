@@ -45,10 +45,13 @@ public static class DataSeeder
         {
             var timeSlots = new List<TimeSlot>
             {
+                new TimeSlot { StartTime = new TimeOnly(10, 0), EndTime = new TimeOnly(12, 0), IsActive = true },
                 new TimeSlot { StartTime = new TimeOnly(12, 0), EndTime = new TimeOnly(14, 0), IsActive = true },
                 new TimeSlot { StartTime = new TimeOnly(14, 0), EndTime = new TimeOnly(16, 0), IsActive = true },
+                new TimeSlot { StartTime = new TimeOnly(16, 0), EndTime = new TimeOnly(18, 0), IsActive = true },
                 new TimeSlot { StartTime = new TimeOnly(18, 0), EndTime = new TimeOnly(20, 0), IsActive = true },
-                new TimeSlot { StartTime = new TimeOnly(20, 0), EndTime = new TimeOnly(22, 0), IsActive = true }
+                new TimeSlot { StartTime = new TimeOnly(20, 0), EndTime = new TimeOnly(22, 0), IsActive = true },
+                new TimeSlot { StartTime = new TimeOnly(22, 0), EndTime = new TimeOnly(23, 0), IsActive = true } // Late slot for Saturday
             };
 
             context.TimeSlots.AddRange(timeSlots);
@@ -68,15 +71,31 @@ public static class DataSeeder
         {
             var operatingHours=new List<OperatingHours>
             {
-                new OperatingHours { DayOfWeek=DayOfWeek.Sunday, IsClosed=true },
+                // Sunday: 10:00 AM to 8:00 PM
+                new OperatingHours { DayOfWeek=DayOfWeek.Sunday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(20,0), IsClosed=false },
+                // Monday to Friday: 10:00 AM to 10:00 PM
                 new OperatingHours { DayOfWeek=DayOfWeek.Monday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
                 new OperatingHours { DayOfWeek=DayOfWeek.Tuesday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
                 new OperatingHours { DayOfWeek=DayOfWeek.Wednesday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
                 new OperatingHours { DayOfWeek=DayOfWeek.Thursday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
-                new OperatingHours { DayOfWeek=DayOfWeek.Friday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(23,0), IsClosed=false },
-                new OperatingHours { DayOfWeek=DayOfWeek.Saturday, OpeningTime=new TimeOnly(9,0), ClosingTime=new TimeOnly(23,0), IsClosed=false }
+                new OperatingHours { DayOfWeek=DayOfWeek.Friday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(22,0), IsClosed=false },
+                // Saturday: 10:00 AM to 11:00 PM
+                new OperatingHours { DayOfWeek=DayOfWeek.Saturday, OpeningTime=new TimeOnly(10,0), ClosingTime=new TimeOnly(23,0), IsClosed=false }
             };
             context.OperatingHours.AddRange(operatingHours);
+        }
+
+        if(!await context.Tables.AnyAsync())
+        {
+            var tables=new List<RestaurantTable>
+            {
+                new RestaurantTable { TableNumber="T1", Capacity=2, Description="Cozy window seat for two" },
+                new RestaurantTable { TableNumber="T2", Capacity=2, Description="Quiet corner table" },
+                new RestaurantTable { TableNumber="T3", Capacity=4, Description="Central booth" },
+                new RestaurantTable { TableNumber="T4", Capacity=4, Description="Patio table" },
+                new RestaurantTable { TableNumber="T5", Capacity=6, Description="Large family table" }
+            };
+            context.Tables.AddRange(tables);
         }
 
         await context.SaveChangesAsync();

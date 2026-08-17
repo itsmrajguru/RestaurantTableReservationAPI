@@ -53,4 +53,40 @@ public class ReservationValidationEngine : IReservationValidationEngine
 
         return ReservationValidationResult.Success();
     }
+
+    public async Task<ReservationValidationResult> ValidateDateAndPartySizeAsync(DateOnly date, int partySize)
+    {
+        var config=await _configRepository.GetConfigurationAsync();
+        if(config==null)
+        {
+            return ReservationValidationResult.Failure("System configuration is missing. Cannot process reservations.");
+        }
+
+        var today=DateOnly.FromDateTime(DateTime.Now);
+
+        // Rule 1: Past Date Check
+        if(date<today)
+        {
+            return ReservationValidationResult.Failure("Reservations cannot be made in the past.");
+        }
+
+        // Rule 3: Advance Booking Check
+        if(date>today.AddDays(config.AdvanceBookingDays))
+        {
+            return ReservationValidationResult.Failure($"Reservations can only be made up to {config.AdvanceBookingDays} days in advance.");
+        }
+
+        // Rule 4: Party Size Check
+        if(partySize>config.MaxPartySize)
+        {
+            return ReservationValidationResult.Failure($"Requested party size ({partySize}) exceeds the restaurant's maximum allowed party size of {config.MaxPartySize}.");
+        }
+
+        if(partySize<=0)
+        {
+            return ReservationValidationResult.Failure("Party size must be greater than zero.");
+        }
+
+        return ReservationValidationResult.Success();
+    }
 }
