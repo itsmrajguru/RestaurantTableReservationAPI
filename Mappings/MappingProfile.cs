@@ -32,5 +32,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.Ignore()) // Don't allow user to set status
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
+
+        // RestaurantConfiguration Mappings
+        CreateMap<RestaurantConfiguration, RestaurantConfigResponseDto>();
+        CreateMap<UpdateRestaurantConfigDto, RestaurantConfiguration>();
     }
 }

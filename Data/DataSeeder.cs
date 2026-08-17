@@ -7,8 +7,8 @@ public static class DataSeeder
 {
     public static async Task SeedAsync(AppDbContext context)
     {
-        if (await context.Users.AnyAsync())
-            return;
+        if (!await context.Users.AnyAsync())
+        {
 
         var users = new List<User>
         {
@@ -38,7 +38,8 @@ public static class DataSeeder
             }
         };
 
-        context.Users.AddRange(users);
+            context.Users.AddRange(users);
+        }
 
         if (!await context.TimeSlots.AnyAsync())
         {
@@ -51,6 +52,16 @@ public static class DataSeeder
             };
 
             context.TimeSlots.AddRange(timeSlots);
+        }
+
+        if(!await context.RestaurantConfigurations.AnyAsync())
+        {
+            context.RestaurantConfigurations.Add(new RestaurantConfiguration
+            {
+                MaxPartySize=20,
+                CancellationWindowHours=2,
+                AdvanceBookingDays=30
+            });
         }
 
         await context.SaveChangesAsync();

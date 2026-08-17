@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<RestaurantTable> Tables { get; set; }
     public DbSet<TimeSlot> TimeSlots { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<RestaurantConfiguration> RestaurantConfigurations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
