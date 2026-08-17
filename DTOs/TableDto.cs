@@ -24,3 +24,19 @@ public class CreateTableDto
     [MaxLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
     public string? Description { get; set; }
 }
+
+public class UpdateTableDto
+{
+    [Required(ErrorMessage = "Table number is required.")]
+    [MaxLength(10, ErrorMessage = "Table number cannot exceed 10 characters.")]
+    public string TableNumber{get;set;}=string.Empty;
+
+    [Required]
+    [Range(1, 20, ErrorMessage = "Table capacity must be between 1 and 20 people.")]
+    public int Capacity{get;set;}
+
+    public bool IsActive{get;set;}
+
+    [MaxLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
+    public string? Description{get;set;}
+}

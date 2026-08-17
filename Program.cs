@@ -25,6 +25,7 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
 // Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITableService, TableService>();
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));

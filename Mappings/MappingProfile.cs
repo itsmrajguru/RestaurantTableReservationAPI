@@ -13,6 +13,7 @@ public class MappingProfile : Profile
         // Table Mappings
         CreateMap<RestaurantTable, TableResponseDto>();
         CreateMap<CreateTableDto, RestaurantTable>();
+        CreateMap<UpdateTableDto, RestaurantTable>();
 
         // TimeSlot Mappings
         CreateMap<TimeSlot, TimeSlotResponseDto>();

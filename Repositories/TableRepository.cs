@@ -14,13 +14,36 @@ public class TableRepository : ITableRepository
         _context = context;
     }
 
-    public async Task<List<RestaurantTable>> GetAllAsync()
+    public async Task<List<RestaurantTable>> GetAllAsync(bool includeInactive=false)
     {
-        return await _context.Tables.Where(t => t.IsActive).ToListAsync();
+        var query=_context.Tables.AsQueryable();
+        if(!includeInactive)
+        {
+            query=query.Where(t=>t.IsActive);
+        }
+        return await query.ToListAsync();
     }
 
-    public async Task<RestaurantTable?> GetByIdAsync(int id)
+    public async Task<RestaurantTable?> GetByIdAsync(int id, bool includeInactive=false)
     {
-        return await _context.Tables.FirstOrDefaultAsync(t => t.Id == id && t.IsActive);
+        var query=_context.Tables.AsQueryable();
+        if(!includeInactive)
+        {
+            query=query.Where(t=>t.IsActive);
+        }
+        return await query.FirstOrDefaultAsync(t=>t.Id==id);
+    }
+
+    public async Task<RestaurantTable> AddAsync(RestaurantTable table)
+    {
+        await _context.Tables.AddAsync(table);
+        await _context.SaveChangesAsync();
+        return table;
+    }
+
+    public async Task UpdateAsync(RestaurantTable table)
+    {
+        _context.Tables.Update(table);
+        await _context.SaveChangesAsync();
     }
 }
