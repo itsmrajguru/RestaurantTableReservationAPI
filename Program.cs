@@ -1,5 +1,7 @@
+//the app builder registers services into the DI
 var builder = WebApplication.CreateBuilder(args);
 
+//app builder says to the asp.NET core, that i'm using these controllers
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -13,11 +15,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+//this actually builds the app
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    //enable swagger as raw json
     app.UseSwagger();
+    //enable swagger ui page
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurant Table Reservation API v1");
@@ -25,11 +30,13 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+//if the app is not running on localhost, redirect to https
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+//connect http routes to controllers
 app.MapControllers();
 
 app.Run();
