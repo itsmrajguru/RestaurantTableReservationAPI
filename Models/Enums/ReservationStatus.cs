@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace RestaurantTableReservationAPI.Models.Enums;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReservationStatus
 {
     Pending = 0,

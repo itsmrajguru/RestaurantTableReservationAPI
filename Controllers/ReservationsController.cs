@@ -42,9 +42,9 @@ public class ReservationsController : ControllerBase
         }
     }
 
-    [HttpGet("my")]
+    [HttpGet("my/upcoming")]
     [Authorize(Roles="Customer")]
-    public async Task<IActionResult> GetMyReservations()
+    public async Task<IActionResult> GetMyUpcomingReservations()
     {
         var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
@@ -52,8 +52,47 @@ public class ReservationsController : ControllerBase
             return Unauthorized(new{message="Invalid user token."});
         }
 
-        var result=await _reservationService.GetCustomerReservationsAsync(userId);
+        var result=await _reservationService.GetCustomerUpcomingReservationsAsync(userId);
         return Ok(result);
+    }
+
+    [HttpGet("my/history")]
+    [Authorize(Roles="Customer")]
+    public async Task<IActionResult> GetMyReservationHistory()
+    {
+        var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+        {
+            return Unauthorized(new{message="Invalid user token."});
+        }
+
+        var result=await _reservationService.GetCustomerReservationHistoryAsync(userId);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize(Roles="Customer")]
+    public async Task<IActionResult> GetReservationDetails(int id)
+    {
+        try
+        {
+            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new{message="Invalid user token."});
+            }
+
+            var result=await _reservationService.GetCustomerReservationByIdAsync(id, userId);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return NotFound(new{message=ex.Message});
+        }
+        catch(UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
     }
 
     [HttpGet]

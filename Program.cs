@@ -13,7 +13,11 @@ using RestaurantTableReservationAPI.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 //app builder says to the asp.NET core, that i'm using these controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -128,10 +128,47 @@ public class ReservationService : IReservationService
         return MapToDto(createdReservation!);
     }
 
-    public async Task<List<ReservationResponseDto>> GetCustomerReservationsAsync(int userId)
+    public async Task<List<ReservationResponseDto>> GetCustomerUpcomingReservationsAsync(int userId)
     {
         var reservations=await _reservationRepository.GetByUserIdAsync(userId);
-        return reservations.Select(MapToDto).ToList();
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        
+        return reservations
+            .Where(r => r.ReservationDate >= today)
+            .OrderBy(r => r.ReservationDate)
+            .ThenBy(r => r.TimeSlot.StartTime)
+            .Select(MapToDto)
+            .ToList();
+    }
+
+    public async Task<List<ReservationResponseDto>> GetCustomerReservationHistoryAsync(int userId)
+    {
+        var reservations=await _reservationRepository.GetByUserIdAsync(userId);
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        
+        return reservations
+            .Where(r => r.ReservationDate < today)
+            .OrderByDescending(r => r.ReservationDate)
+            .ThenByDescending(r => r.TimeSlot.StartTime)
+            .Select(MapToDto)
+            .ToList();
+    }
+
+    public async Task<ReservationResponseDto> GetCustomerReservationByIdAsync(int reservationId, int userId)
+    {
+        var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+        
+        if(reservation == null)
+        {
+            throw new ArgumentException("Reservation not found.");
+        }
+
+        if(reservation.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to view this reservation.");
+        }
+
+        return MapToDto(reservation);
     }
 
     public async Task<List<ReservationResponseDto>> GetAllReservationsAsync()
