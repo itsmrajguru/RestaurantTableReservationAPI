@@ -74,7 +74,18 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Restaurant Table Reservation API",
         Version = "v1",
-        Description = "REST API Developed by Mangesh❤️"
+        Description = @"
+<h3>Welcome to the Restaurant Table Reservation API! 🍽️</h3>
+<p>This API provides a complete backend solution for managing a restaurant's table reservations. It supports role-based authentication, real-time availability checks, and conflict-free booking.</p>
+<h4>✨ Key Features</h4>
+<ul>
+  <li><strong>Authentication & Roles:</strong> Secure JWT-based auth with `Admin`, `Staff`, and `Customer` roles.</li>
+  <li><strong>Table Management:</strong> Admins can manage table layouts, capacity, and operating hours.</li>
+  <li><strong>Smart Reservations:</strong> Prevents double-booking and enforces cancellation window policies.</li>
+  <li><strong>Workflow:</strong> Staff can confirm, mark no-shows, and handle walk-ins effortlessly.</li>
+</ul>
+<b>REST API Developed by Mangesh ❤️</b>
+"
     });
 
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -122,6 +133,8 @@ if (app.Environment.IsDevelopment())
     // Global Exception Handler Middleware (before swagger)
     app.UseMiddleware<GlobalExceptionMiddleware>();
 
+    app.UseStaticFiles();
+
     //enable swagger as raw json
     app.UseSwagger();
     //enable swagger ui page
@@ -129,6 +142,7 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurant Table Reservation API v1");
         options.RoutePrefix = string.Empty;
+        options.InjectStylesheet("/swagger-ui/custom.css");
     });
 }
 
