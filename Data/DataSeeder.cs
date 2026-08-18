@@ -99,5 +99,80 @@ public static class DataSeeder
         }
 
         await context.SaveChangesAsync();
+
+        // Ensure new users are seeded
+        var newUsersToSeed = new List<User>
+        {
+            new User { Name = "Pratik", Email = "pratik@restaurant.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("pratik@123"), Role = UserRoles.Customer, CreatedAt = DateTime.UtcNow },
+            new User { Name = "Vikrant", Email = "vikrant@restaurant.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("vikrant@123"), Role = UserRoles.Customer, CreatedAt = DateTime.UtcNow },
+            new User { Name = "Eshaan", Email = "eshaan@restaurant.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("eshaan@123"), Role = UserRoles.Customer, CreatedAt = DateTime.UtcNow },
+            new User { Name = "Aryan", Email = "aryan@restaurant.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("aryan@123"), Role = UserRoles.Customer, CreatedAt = DateTime.UtcNow },
+            new User { Name = "Harshal", Email = "harshal@restaurant.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("harshal@123"), Role = UserRoles.Customer, CreatedAt = DateTime.UtcNow }
+        };
+
+        bool newUsersAdded = false;
+        foreach (var newUser in newUsersToSeed)
+        {
+            if (!await context.Users.AnyAsync(u => u.Email == newUser.Email))
+            {
+                context.Users.Add(newUser);
+                newUsersAdded = true;
+            }
+        }
+        
+        if (newUsersAdded)
+        {
+            await context.SaveChangesAsync();
+        }
+
+        // Only seed reservations if Pratik has no reservations (to avoid duplicate seeding on every restart)
+        var pratik = await context.Users.FirstOrDefaultAsync(u => u.Email == "pratik@restaurant.com");
+        if (pratik != null && !await context.Reservations.AnyAsync(r => r.UserId == pratik.Id))
+        {
+            var vikrant = await context.Users.FirstAsync(u => u.Email == "vikrant@restaurant.com");
+            var eshaan = await context.Users.FirstAsync(u => u.Email == "eshaan@restaurant.com");
+            var aryan = await context.Users.FirstAsync(u => u.Email == "aryan@restaurant.com");
+            var harshal = await context.Users.FirstAsync(u => u.Email == "harshal@restaurant.com");
+            
+            var allUsers = new[] { pratik, vikrant, eshaan, aryan, harshal };
+            var notes = new[] { "Birthday celebration!", "Anniversary dinner", "Business meeting", "Please arrange a corner table", "Looking forward to trying the new menu", "Allergic to peanuts", "Window seat requested" };
+            var rnd = new Random(42);
+
+            var tables = await context.Tables.ToListAsync();
+            var slots = await context.TimeSlots.ToListAsync();
+            
+            var reservations = new List<Reservation>();
+
+            // For the next 10 days
+            for (int i = 0; i <= 10; i++)
+            {
+                var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(i));
+                
+                // Book 3-4 random tables per day
+                for(int j = 0; j < 4; j++)
+                {
+                    var user = allUsers[rnd.Next(allUsers.Length)];
+                    var table = tables[rnd.Next(tables.Count)];
+                    var slot = slots[rnd.Next(slots.Count)];
+                    
+                    if (!reservations.Any(r => r.ReservationDate == date && r.TimeSlotId == slot.Id && r.TableId == table.Id) &&
+                        !await context.Reservations.AnyAsync(r => r.ReservationDate == date && r.TimeSlotId == slot.Id && r.TableId == table.Id))
+                    {
+                        reservations.Add(new Reservation
+                        {
+                            UserId = user.Id,
+                            TableId = table.Id,
+                            TimeSlotId = slot.Id,
+                            ReservationDate = date,
+                            PartySize = rnd.Next(1, table.Capacity + 1),
+                            Notes = notes[rnd.Next(notes.Length)],
+                            Status = Models.Enums.ReservationStatus.Confirmed
+                        });
+                    }
+                }
+            }
+            context.Reservations.AddRange(reservations);
+            await context.SaveChangesAsync();
+        }
     }
 }
