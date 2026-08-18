@@ -28,7 +28,7 @@ public class ReservationsController : ControllerBase
         }
 
         var result=await _reservationService.CreateReservationAsync(userId, dto);
-        return Ok(result);
+        return StatusCode(201, result);
     }
 
     [HttpGet("my/upcoming")]

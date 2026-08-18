@@ -134,6 +134,48 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "Login Pratik (Second Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"pratikToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"pratik@restaurant.com\",\n    \"password\": \"pratik@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
 				}
 			]
 		},
@@ -175,7 +217,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tableNumber\": \"T99\",\n    \"seatingCapacity\": 6\n}"
+							"raw": "{\n    \"tableNumber\": \"T-POSTMAN-01\",\n    \"capacity\": 4,\n    \"description\": \"Test table added via Postman runner\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/tables",
@@ -190,14 +232,14 @@
 					}
 				},
 				{
-					"name": "Scenario 2: Customer Search & Reserve",
+					"name": "Scenario 2: Customer Books a Table",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
 									"});",
 									"var jsonData = pm.response.json();",
 									"pm.environment.set(\"reservationId\", jsonData.id);"
@@ -226,7 +268,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6\n}"
+							"raw": "{\n    \"reservationDate\": \"2026-08-25\",\n    \"timeSlotId\": 7,\n    \"partySize\": 2,\n    \"notes\": \"Window seat preferred please!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",
@@ -392,7 +434,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tableNumber\": \"T-HACK\",\n    \"seatingCapacity\": 10\n}"
+							"raw": "{\n    \"tableNumber\": \"T-HACK\",\n    \"capacity\": 10\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/tables",
@@ -509,7 +551,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{customerToken}}",
+									"value": "{{pratikToken}}",
 									"type": "string"
 								}
 							]
@@ -523,7 +565,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6\n}"
+							"raw": "{\n    \"reservationDate\": \"2026-08-25\",\n    \"timeSlotId\": 7,\n    \"partySize\": 2,\n    \"notes\": \"Trying to book the same slot - should conflict!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",
@@ -558,21 +600,21 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{customerToken}}",
+									"value": "{{pratikToken}}",
 									"type": "string"
 								}
 							]
 						},
 						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/api/reservations/999",
+							"raw": "{{baseUrl}}/api/reservations/{{reservationId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"reservations",
-								"999"
+								"{{reservationId}}"
 							]
 						}
 					}
