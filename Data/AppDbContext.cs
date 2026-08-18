@@ -50,5 +50,10 @@ public class AppDbContext : DbContext
             .WithMany(ts => ts.Reservations)
             .HasForeignKey(r => r.TimeSlotId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Store ReservationStatus as String in Database instead of Integer
+        modelBuilder.Entity<Reservation>()
+            .Property(r => r.Status)
+            .HasConversion<string>();
     }
 }

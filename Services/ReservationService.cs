@@ -177,19 +177,114 @@ public class ReservationService : IReservationService
         return reservations.Select(MapToDto).ToList();
     }
 
-    public async Task<ReservationResponseDto> UpdateStatusAsync(int reservationId, Models.Enums.ReservationStatus newStatus)
+    public async Task<ReservationResponseDto> ConfirmReservationAsync(int reservationId)
     {
         var reservation=await _reservationRepository.GetByIdAsync(reservationId);
-        if(reservation==null)
-        {
-            throw new ArgumentException("Reservation not found.");
-        }
+        if(reservation==null) throw new ArgumentException("Reservation not found.");
 
-        reservation.Status=newStatus;
+        if(reservation.Status!=Models.Enums.ReservationStatus.Pending)
+            throw new ArgumentException($"Cannot confirm a reservation in '{reservation.Status}' status.");
+
+        reservation.Status=Models.Enums.ReservationStatus.Confirmed;
         await _reservationRepository.UpdateAsync(reservation);
         
         var updated=await _reservationRepository.GetByIdAsync(reservationId);
         return MapToDto(updated!);
+    }
+
+    public async Task<ReservationResponseDto> MarkNoShowAsync(int reservationId)
+    {
+        var reservation=await _reservationRepository.GetByIdAsync(reservationId);
+        if(reservation==null) throw new ArgumentException("Reservation not found.");
+
+        if(reservation.Status!=Models.Enums.ReservationStatus.Confirmed && reservation.Status!=Models.Enums.ReservationStatus.Pending)
+            throw new ArgumentException($"Only Pending or Confirmed reservations can be marked as No-Show.");
+
+        reservation.Status=Models.Enums.ReservationStatus.NoShow;
+        await _reservationRepository.UpdateAsync(reservation);
+        
+        var updated=await _reservationRepository.GetByIdAsync(reservationId);
+        return MapToDto(updated!);
+    }
+
+    public async Task<ReservationResponseDto> CompleteReservationAsync(int reservationId)
+    {
+        var reservation=await _reservationRepository.GetByIdAsync(reservationId);
+        if(reservation==null) throw new ArgumentException("Reservation not found.");
+
+        if(reservation.Status!=Models.Enums.ReservationStatus.Confirmed && reservation.Status!=Models.Enums.ReservationStatus.WalkIn)
+            throw new ArgumentException($"Only Confirmed or WalkIn reservations can be Completed.");
+
+        reservation.Status=Models.Enums.ReservationStatus.Completed;
+        await _reservationRepository.UpdateAsync(reservation);
+        
+        var updated=await _reservationRepository.GetByIdAsync(reservationId);
+        return MapToDto(updated!);
+    }
+
+    public async Task<ReservationResponseDto> HandleWalkInAsync(int userId, CreateWalkInDto dto)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var nowTime = TimeOnly.FromDateTime(DateTime.Now);
+
+        // Find the current active time slot
+        var timeSlots = await _timeSlotRepository.GetAllAsync();
+        var currentTimeSlot = timeSlots.FirstOrDefault(ts => 
+            ts.IsActive && 
+            ts.StartTime <= nowTime && 
+            ts.EndTime >= nowTime);
+
+        if(currentTimeSlot == null)
+            throw new ArgumentException("The restaurant is not currently taking walk-ins or is outside operating hours.");
+
+        // Find available table
+        var allTables = await _tableRepository.GetAllAsync();
+        var capableTables = allTables
+            .Where(t => t.Capacity >= dto.PartySize)
+            .OrderBy(t => t.Capacity)
+            .ToList();
+
+        if(!capableTables.Any())
+            throw new ArgumentException($"No tables large enough for a party of {dto.PartySize}.");
+
+        RestaurantTable? assignedTable = null;
+        
+        foreach(var table in capableTables)
+        {
+            bool isBooked = await _reservationRepository.IsTableBookedAsync(table.Id, today, currentTimeSlot.Id);
+            if(!isBooked)
+            {
+                assignedTable = table;
+                break;
+            }
+        }
+
+        if(assignedTable == null)
+            throw new ArgumentException("No tables are currently available for walk-ins.");
+
+        var reservation = new Reservation
+        {
+            UserId = userId,
+            TableId = assignedTable.Id,
+            TimeSlotId = currentTimeSlot.Id,
+            ReservationDate = today,
+            PartySize = dto.PartySize,
+            Notes = dto.Notes,
+            Status = Models.Enums.ReservationStatus.WalkIn,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        try
+        {
+            await _reservationRepository.CreateReservationWithConcurrencyCheckAsync(reservation);
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("Table was grabbed by another booking. Please try again.");
+        }
+
+        var createdReservation = await _reservationRepository.GetByIdAsync(reservation.Id);
+        return MapToDto(createdReservation!);
     }
 
     public async Task<bool> CancelReservationAsync(int reservationId, int userId)

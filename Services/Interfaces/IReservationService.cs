@@ -9,6 +9,9 @@ public interface IReservationService
     Task<List<ReservationResponseDto>> GetCustomerReservationHistoryAsync(int userId);
     Task<ReservationResponseDto> GetCustomerReservationByIdAsync(int reservationId, int userId);
     Task<List<ReservationResponseDto>> GetAllReservationsAsync();
-    Task<ReservationResponseDto> UpdateStatusAsync(int reservationId, Models.Enums.ReservationStatus newStatus);
+    Task<ReservationResponseDto> ConfirmReservationAsync(int reservationId);
+    Task<ReservationResponseDto> MarkNoShowAsync(int reservationId);
+    Task<ReservationResponseDto> CompleteReservationAsync(int reservationId);
+    Task<ReservationResponseDto> HandleWalkInAsync(int userId, CreateWalkInDto dto);
     Task<bool> CancelReservationAsync(int reservationId, int userId);
 }

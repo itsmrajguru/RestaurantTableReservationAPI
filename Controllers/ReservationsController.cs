@@ -103,18 +103,73 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPut("{id}/status")]
+    [HttpPut("{id}/confirm")]
     [Authorize(Roles="Admin,Staff")]
-    public async Task<IActionResult> UpdateReservationStatus(int id, [FromBody] UpdateReservationStatusDto dto)
+    public async Task<IActionResult> ConfirmReservation(int id)
     {
         try
         {
-            var result=await _reservationService.UpdateStatusAsync(id, dto.Status);
+            var result=await _reservationService.ConfirmReservationAsync(id);
             return Ok(result);
         }
         catch(ArgumentException ex)
         {
             return BadRequest(new{message=ex.Message});
+        }
+    }
+
+    [HttpPut("{id}/no-show")]
+    [Authorize(Roles="Admin,Staff")]
+    public async Task<IActionResult> MarkNoShow(int id)
+    {
+        try
+        {
+            var result=await _reservationService.MarkNoShowAsync(id);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+    }
+
+    [HttpPut("{id}/complete")]
+    [Authorize(Roles="Admin,Staff")]
+    public async Task<IActionResult> CompleteReservation(int id)
+    {
+        try
+        {
+            var result=await _reservationService.CompleteReservationAsync(id);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+    }
+
+    [HttpPost("walk-in")]
+    [Authorize(Roles="Admin,Staff")]
+    public async Task<IActionResult> HandleWalkIn([FromBody] CreateWalkInDto dto)
+    {
+        try
+        {
+            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new{message="Invalid user token."});
+            }
+
+            var result=await _reservationService.HandleWalkInAsync(userId, dto);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+        catch(InvalidOperationException ex)
+        {
+            return Conflict(new{message=ex.Message});
         }
     }
 
