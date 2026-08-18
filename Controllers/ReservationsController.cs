@@ -59,4 +59,44 @@ public class ReservationsController : ControllerBase
         var result=await _reservationService.GetAllReservationsAsync();
         return Ok(result);
     }
+
+    [HttpPut("{id}/status")]
+    [Authorize(Roles="Admin,Staff")]
+    public async Task<IActionResult> UpdateReservationStatus(int id, [FromBody] UpdateReservationStatusDto dto)
+    {
+        try
+        {
+            var result=await _reservationService.UpdateStatusAsync(id, dto.Status);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+    }
+
+    [HttpPut("{id}/cancel")]
+    [Authorize(Roles="Customer")]
+    public async Task<IActionResult> CancelReservation(int id)
+    {
+        try
+        {
+            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new{message="Invalid user token."});
+            }
+
+            var result=await _reservationService.CancelReservationAsync(id, userId);
+            return Ok(new{message="Reservation successfully cancelled."});
+        }
+        catch(UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+    }
 }

@@ -13,19 +13,22 @@ public class ReservationService : IReservationService
     private readonly ITimeSlotRepository _timeSlotRepository;
     private readonly IOperatingHoursRepository _operatingHoursRepository;
     private readonly IReservationValidationEngine _validationEngine;
+    private readonly IRestaurantConfigRepository _configRepository;
 
     public ReservationService(
         IReservationRepository reservationRepository,
         ITableRepository tableRepository,
         ITimeSlotRepository timeSlotRepository,
         IOperatingHoursRepository operatingHoursRepository,
-        IReservationValidationEngine validationEngine)
+        IReservationValidationEngine validationEngine,
+        IRestaurantConfigRepository configRepository)
     {
         _reservationRepository=reservationRepository;
         _tableRepository=tableRepository;
         _timeSlotRepository=timeSlotRepository;
         _operatingHoursRepository=operatingHoursRepository;
         _validationEngine=validationEngine;
+        _configRepository=configRepository;
     }
 
     public async Task<ReservationResponseDto> CreateReservationAsync(int userId, CreateReservationDto dto)
@@ -128,6 +131,62 @@ public class ReservationService : IReservationService
     {
         var reservations=await _reservationRepository.GetAllAsync();
         return reservations.Select(MapToDto).ToList();
+    }
+
+    public async Task<ReservationResponseDto> UpdateStatusAsync(int reservationId, Models.Enums.ReservationStatus newStatus)
+    {
+        var reservation=await _reservationRepository.GetByIdAsync(reservationId);
+        if(reservation==null)
+        {
+            throw new ArgumentException("Reservation not found.");
+        }
+
+        reservation.Status=newStatus;
+        await _reservationRepository.UpdateAsync(reservation);
+        
+        var updated=await _reservationRepository.GetByIdAsync(reservationId);
+        return MapToDto(updated!);
+    }
+
+    public async Task<bool> CancelReservationAsync(int reservationId, int userId)
+    {
+        var reservation=await _reservationRepository.GetByIdAsync(reservationId);
+        if(reservation==null)
+        {
+            throw new ArgumentException("Reservation not found.");
+        }
+
+        if(reservation.UserId!=userId)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to cancel this reservation.");
+        }
+
+        if(reservation.Status==Models.Enums.ReservationStatus.Cancelled)
+        {
+            return true; // Already cancelled
+        }
+
+        if(reservation.Status!=Models.Enums.ReservationStatus.Pending && reservation.Status!=Models.Enums.ReservationStatus.Confirmed)
+        {
+            throw new ArgumentException($"Cannot cancel a reservation in {reservation.Status} status.");
+        }
+
+        // Check cancellation window
+        var config=await _configRepository.GetConfigurationAsync();
+        if(config!=null)
+        {
+            var reservationDateTime=reservation.ReservationDate.ToDateTime(reservation.TimeSlot.StartTime);
+            var minCancelTime=reservationDateTime.AddHours(-config.CancellationWindowHours);
+
+            if(DateTime.Now>minCancelTime)
+            {
+                throw new ArgumentException($"Reservations cannot be cancelled within {config.CancellationWindowHours} hours of the booking time.");
+            }
+        }
+
+        reservation.Status=Models.Enums.ReservationStatus.Cancelled;
+        await _reservationRepository.UpdateAsync(reservation);
+        return true;
     }
 
     private ReservationResponseDto MapToDto(Reservation r)
