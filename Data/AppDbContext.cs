@@ -55,5 +55,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Reservation>()
             .Property(r => r.Status)
             .HasConversion<string>();
+
+        // Store TableStatus as String in Database instead of Integer
+        modelBuilder.Entity<RestaurantTable>()
+            .Property(t => t.Status)
+            .HasConversion<string>();
     }
 }

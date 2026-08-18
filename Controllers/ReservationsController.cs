@@ -118,6 +118,21 @@ public class ReservationsController : ControllerBase
         }
     }
 
+    [HttpPut("{id}/check-in")]
+    [Authorize(Roles="Admin,Staff")]
+    public async Task<IActionResult> CheckInReservation(int id)
+    {
+        try
+        {
+            var result=await _reservationService.CheckInAsync(id);
+            return Ok(result);
+        }
+        catch(ArgumentException ex)
+        {
+            return BadRequest(new{message=ex.Message});
+        }
+    }
+
     [HttpPut("{id}/no-show")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> MarkNoShow(int id)

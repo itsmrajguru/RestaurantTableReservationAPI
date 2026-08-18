@@ -10,6 +10,7 @@ public interface IReservationService
     Task<ReservationResponseDto> GetCustomerReservationByIdAsync(int reservationId, int userId);
     Task<List<ReservationResponseDto>> GetAllReservationsAsync();
     Task<ReservationResponseDto> ConfirmReservationAsync(int reservationId);
+    Task<ReservationResponseDto> CheckInAsync(int reservationId);
     Task<ReservationResponseDto> MarkNoShowAsync(int reservationId);
     Task<ReservationResponseDto> CompleteReservationAsync(int reservationId);
     Task<ReservationResponseDto> HandleWalkInAsync(int userId, CreateWalkInDto dto);

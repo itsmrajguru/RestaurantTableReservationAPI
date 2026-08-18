@@ -17,5 +17,7 @@ public class RestaurantTable
     [MaxLength(200)]
     public string? Description { get; set; }
 
+    public Enums.TableStatus Status { get; set; } = Enums.TableStatus.Available;
+
     public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }

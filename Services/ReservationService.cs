@@ -188,6 +188,35 @@ public class ReservationService : IReservationService
         reservation.Status=Models.Enums.ReservationStatus.Confirmed;
         await _reservationRepository.UpdateAsync(reservation);
         
+        var table = await _tableRepository.GetByIdAsync(reservation.TableId);
+        if (table != null)
+        {
+            table.Status = Models.Enums.TableStatus.Reserved;
+            await _tableRepository.UpdateAsync(table);
+        }
+        
+        var updated=await _reservationRepository.GetByIdAsync(reservationId);
+        return MapToDto(updated!);
+    }
+
+    public async Task<ReservationResponseDto> CheckInAsync(int reservationId)
+    {
+        var reservation=await _reservationRepository.GetByIdAsync(reservationId);
+        if(reservation==null) throw new ArgumentException("Reservation not found.");
+
+        if(reservation.Status!=Models.Enums.ReservationStatus.Confirmed)
+            throw new ArgumentException($"Only Confirmed reservations can be checked in.");
+
+        reservation.Status=Models.Enums.ReservationStatus.CheckedIn;
+        await _reservationRepository.UpdateAsync(reservation);
+        
+        var table = await _tableRepository.GetByIdAsync(reservation.TableId);
+        if (table != null)
+        {
+            table.Status = Models.Enums.TableStatus.Occupied;
+            await _tableRepository.UpdateAsync(table);
+        }
+
         var updated=await _reservationRepository.GetByIdAsync(reservationId);
         return MapToDto(updated!);
     }
@@ -203,6 +232,13 @@ public class ReservationService : IReservationService
         reservation.Status=Models.Enums.ReservationStatus.NoShow;
         await _reservationRepository.UpdateAsync(reservation);
         
+        var table = await _tableRepository.GetByIdAsync(reservation.TableId);
+        if (table != null)
+        {
+            table.Status = Models.Enums.TableStatus.Available;
+            await _tableRepository.UpdateAsync(table);
+        }
+        
         var updated=await _reservationRepository.GetByIdAsync(reservationId);
         return MapToDto(updated!);
     }
@@ -212,11 +248,18 @@ public class ReservationService : IReservationService
         var reservation=await _reservationRepository.GetByIdAsync(reservationId);
         if(reservation==null) throw new ArgumentException("Reservation not found.");
 
-        if(reservation.Status!=Models.Enums.ReservationStatus.Confirmed && reservation.Status!=Models.Enums.ReservationStatus.WalkIn)
-            throw new ArgumentException($"Only Confirmed or WalkIn reservations can be Completed.");
+        if(reservation.Status!=Models.Enums.ReservationStatus.CheckedIn && reservation.Status!=Models.Enums.ReservationStatus.WalkIn)
+            throw new ArgumentException($"Only CheckedIn or WalkIn reservations can be Completed.");
 
         reservation.Status=Models.Enums.ReservationStatus.Completed;
         await _reservationRepository.UpdateAsync(reservation);
+        
+        var table = await _tableRepository.GetByIdAsync(reservation.TableId);
+        if (table != null)
+        {
+            table.Status = Models.Enums.TableStatus.Available;
+            await _tableRepository.UpdateAsync(table);
+        }
         
         var updated=await _reservationRepository.GetByIdAsync(reservationId);
         return MapToDto(updated!);
@@ -277,6 +320,8 @@ public class ReservationService : IReservationService
         try
         {
             await _reservationRepository.CreateReservationWithConcurrencyCheckAsync(reservation);
+            assignedTable.Status = Models.Enums.TableStatus.Occupied;
+            await _tableRepository.UpdateAsync(assignedTable);
         }
         catch (InvalidOperationException)
         {
@@ -325,6 +370,14 @@ public class ReservationService : IReservationService
 
         reservation.Status=Models.Enums.ReservationStatus.Cancelled;
         await _reservationRepository.UpdateAsync(reservation);
+        
+        var table = await _tableRepository.GetByIdAsync(reservation.TableId);
+        if (table != null)
+        {
+            table.Status = Models.Enums.TableStatus.Available;
+            await _tableRepository.UpdateAsync(table);
+        }
+
         return true;
     }
 
