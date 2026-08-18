@@ -21,25 +21,14 @@ public class ReservationsController : ControllerBase
     [Authorize] // Both Customers and Admins can create reservations
     public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
     {
-        try
+        var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
         {
-            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-            {
-                return Unauthorized(new{message="Invalid user token."});
-            }
+            throw new UnauthorizedAccessException("Invalid user token.");
+        }
 
-            var result=await _reservationService.CreateReservationAsync(userId, dto);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
-        catch(InvalidOperationException ex)
-        {
-            return Conflict(new{message=ex.Message});
-        }
+        var result=await _reservationService.CreateReservationAsync(userId, dto);
+        return Ok(result);
     }
 
     [HttpGet("my/upcoming")]
@@ -74,25 +63,14 @@ public class ReservationsController : ControllerBase
     [Authorize(Roles="Customer")]
     public async Task<IActionResult> GetReservationDetails(int id)
     {
-        try
+        var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
         {
-            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-            {
-                return Unauthorized(new{message="Invalid user token."});
-            }
+            throw new UnauthorizedAccessException("Invalid user token.");
+        }
 
-            var result=await _reservationService.GetCustomerReservationByIdAsync(id, userId);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return NotFound(new{message=ex.Message});
-        }
-        catch(UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var result=await _reservationService.GetCustomerReservationByIdAsync(id, userId);
+        return Ok(result);
     }
 
     [HttpGet]
@@ -107,110 +85,60 @@ public class ReservationsController : ControllerBase
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> ConfirmReservation(int id)
     {
-        try
-        {
-            var result=await _reservationService.ConfirmReservationAsync(id);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        var result=await _reservationService.ConfirmReservationAsync(id);
+        return Ok(result);
     }
 
     [HttpPut("{id}/check-in")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> CheckInReservation(int id)
     {
-        try
-        {
-            var result=await _reservationService.CheckInAsync(id);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        var result=await _reservationService.CheckInAsync(id);
+        return Ok(result);
     }
 
     [HttpPut("{id}/no-show")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> MarkNoShow(int id)
     {
-        try
-        {
-            var result=await _reservationService.MarkNoShowAsync(id);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        var result=await _reservationService.MarkNoShowAsync(id);
+        return Ok(result);
     }
 
     [HttpPut("{id}/complete")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> CompleteReservation(int id)
     {
-        try
-        {
-            var result=await _reservationService.CompleteReservationAsync(id);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        var result=await _reservationService.CompleteReservationAsync(id);
+        return Ok(result);
     }
 
     [HttpPost("walk-in")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> HandleWalkIn([FromBody] CreateWalkInDto dto)
     {
-        try
+        var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
         {
-            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-            {
-                return Unauthorized(new{message="Invalid user token."});
-            }
+            throw new UnauthorizedAccessException("Invalid user token.");
+        }
 
-            var result=await _reservationService.HandleWalkInAsync(userId, dto);
-            return Ok(result);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
-        catch(InvalidOperationException ex)
-        {
-            return Conflict(new{message=ex.Message});
-        }
+        var result=await _reservationService.HandleWalkInAsync(userId, dto);
+        return Ok(result);
     }
 
     [HttpPut("{id}/cancel")]
     [Authorize(Roles="Customer,Admin,Staff")]
     public async Task<IActionResult> CancelReservation(int id)
     {
-        try
+        var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
         {
-            var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
-            {
-                return Unauthorized(new{message="Invalid user token."});
-            }
+            throw new UnauthorizedAccessException("Invalid user token.");
+        }
 
-            bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
-            var result=await _reservationService.CancelReservationAsync(id, userId, isAdmin);
-            return Ok(new{message="Reservation successfully cancelled."});
-        }
-        catch(UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
+        var result=await _reservationService.CancelReservationAsync(id, userId, isAdmin);
+        return Ok(new{message="Reservation successfully cancelled."});
     }
 }

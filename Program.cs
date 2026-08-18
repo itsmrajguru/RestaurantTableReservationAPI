@@ -8,6 +8,7 @@ using RestaurantTableReservationAPI.Repositories;
 using RestaurantTableReservationAPI.Repositories.Interfaces;
 using RestaurantTableReservationAPI.Services;
 using RestaurantTableReservationAPI.Services.Interfaces;
+using RestaurantTableReservationAPI.Middlewares;
 
 //the app builder registers services into the DI
 var builder = WebApplication.CreateBuilder(args);
@@ -133,6 +134,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Global Exception Handler Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 //connect http routes to controllers
 app.MapControllers();

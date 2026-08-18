@@ -37,15 +37,8 @@ public class OperatingHoursController : ControllerBase
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> UpdateOperatingHours(int id, [FromBody] UpdateOperatingHoursDto updateDto)
     {
-        try
-        {
-            var updatedHours=await _operatingHoursService.UpdateOperatingHoursAsync(id, updateDto);
-            if(updatedHours==null) return NotFound(new{message="Operating hours not found."});
-            return Ok(updatedHours);
-        }
-        catch(ArgumentException ex)
-        {
-            return BadRequest(new{message=ex.Message});
-        }
+        var updatedHours=await _operatingHoursService.UpdateOperatingHoursAsync(id, updateDto);
+        if(updatedHours==null) return NotFound(new{message="Operating hours not found."});
+        return Ok(updatedHours);
     }
 }
