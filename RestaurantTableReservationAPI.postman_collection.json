@@ -1,0 +1,590 @@
+{
+	"info": {
+		"_postman_id": "aa3a9a11-5369-45ad-bc06-1502444cb012",
+		"name": "Restaurant Table Reservation API (Complete)",
+		"description": "End-to-End Business Scenarios & Role-Restricted Negative Tests for Stage 23",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup Authentication",
+			"item": [
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"adminToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@restaurant.com\",\n    \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"staffToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"staff@restaurant.com\",\n    \"password\": \"Staff@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Login Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"customerToken\", jsonData.token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"customer@restaurant.com\",\n    \"password\": \"Customer@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Happy Path Business Scenarios",
+			"item": [
+				{
+					"name": "Scenario 1: Admin Configures Tables",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tableNumber\": \"T99\",\n    \"seatingCapacity\": 6\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tables",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tables"
+							]
+						}
+					}
+				},
+				{
+					"name": "Scenario 2: Customer Search & Reserve",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"reservationId\", jsonData.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					}
+				},
+				{
+					"name": "Scenario 4: Staff Confirms Reservation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{staffToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations/{{reservationId}}/confirm",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								"{{reservationId}}",
+								"confirm"
+							]
+						}
+					}
+				},
+				{
+					"name": "Scenario 5: Staff Handles Check-in",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{staffToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations/{{reservationId}}/check-in",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								"{{reservationId}}",
+								"check-in"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Role-Restricted Scenarios (Negative Tests)",
+			"item": [
+				{
+					"name": "1. Unauthenticated Request -> 401 Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					}
+				},
+				{
+					"name": "2. Customer Tries Admin Endpoint -> 403 Forbidden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tableNumber\": \"T-HACK\",\n    \"seatingCapacity\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tables",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tables"
+							]
+						}
+					}
+				},
+				{
+					"name": "3. Customer Tries Staff Endpoint (Check-in) -> 403 Forbidden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations/1/check-in",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								"1",
+								"check-in"
+							]
+						}
+					}
+				},
+				{
+					"name": "4. Staff Tries Customer-Only Endpoint -> 403 Forbidden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{staffToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations/my/upcoming",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								"my",
+								"upcoming"
+							]
+						}
+					}
+				},
+				{
+					"name": "5. Scenario 3: Double Booking Conflict -> 409 Conflict",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 409\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations"
+							]
+						}
+					}
+				},
+				{
+					"name": "6. Scenario 7: Access Someone Else's Reservation -> 403 Forbidden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{customerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/reservations/999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"reservations",
+								"999"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5021",
+			"type": "string"
+		}
+	]
+}
