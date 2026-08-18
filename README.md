@@ -86,6 +86,13 @@ When you run the API for the first time, it automatically creates a default Admi
 - **Email**: `admin@restaurant.com`
 - **Password**: `Admin@123`
 
+**Default Staff Account**
+- **Email**: `staff@restaurant.com`
+- **Password**: `Staff@123`
+
+**Default Customer Accounts**
+- **Email**: `customer@restaurant.com` | **Password**: `Customer@123`
+
 ### How to Authenticate via Swagger:
 1. Go to the `POST /api/auth/login` endpoint.
 2. Enter the Admin credentials above.

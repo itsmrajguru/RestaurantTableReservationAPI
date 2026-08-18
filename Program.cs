@@ -119,6 +119,9 @@ using (var scope = app.Services.CreateScope())
 
 if (app.Environment.IsDevelopment())
 {
+    // Global Exception Handler Middleware (before swagger)
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
     //enable swagger as raw json
     app.UseSwagger();
     //enable swagger ui page
@@ -134,9 +137,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Global Exception Handler Middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
 
 //connect http routes to controllers
 app.MapControllers();
