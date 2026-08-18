@@ -80,7 +80,7 @@ public class ReservationService : IReservationService
 
         if(!capableTables.Any())
         {
-            throw new ArgumentException($"No tables available that can accommodate a party of {dto.PartySize}.");
+            throw new InvalidOperationException($"No tables available that can accommodate a party of {dto.PartySize}.");
         }
 
         RestaurantTable? assignedTable=null;
@@ -97,7 +97,7 @@ public class ReservationService : IReservationService
 
         if(assignedTable==null)
         {
-            throw new ArgumentException("No tables are available for the selected date and time slot.");
+            throw new InvalidOperationException("No tables are available for the selected date and time slot.");
         }
 
         // 5. Create the Reservation
@@ -288,7 +288,7 @@ public class ReservationService : IReservationService
             .ToList();
 
         if(!capableTables.Any())
-            throw new ArgumentException($"No tables large enough for a party of {dto.PartySize}.");
+            throw new InvalidOperationException($"No tables large enough for a party of {dto.PartySize}.");
 
         RestaurantTable? assignedTable = null;
         
@@ -303,7 +303,7 @@ public class ReservationService : IReservationService
         }
 
         if(assignedTable == null)
-            throw new ArgumentException("No tables are currently available for walk-ins.");
+            throw new InvalidOperationException("No tables are currently available for walk-ins.");
 
         var reservation = new Reservation
         {

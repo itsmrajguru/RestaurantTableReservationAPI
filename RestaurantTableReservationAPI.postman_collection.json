@@ -226,7 +226,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 2\n}"
+							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",
@@ -523,7 +523,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 2\n}"
+							"raw": "{\n    \"reservationDate\": \"2030-10-10\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",
