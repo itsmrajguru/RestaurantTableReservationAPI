@@ -189,7 +189,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpPut("{id}/cancel")]
-    [Authorize(Roles="Customer")]
+    [Authorize(Roles="Customer,Admin,Staff")]
     public async Task<IActionResult> CancelReservation(int id)
     {
         try
@@ -200,7 +200,8 @@ public class ReservationsController : ControllerBase
                 return Unauthorized(new{message="Invalid user token."});
             }
 
-            var result=await _reservationService.CancelReservationAsync(id, userId);
+            bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
+            var result=await _reservationService.CancelReservationAsync(id, userId, isAdmin);
             return Ok(new{message="Reservation successfully cancelled."});
         }
         catch(UnauthorizedAccessException ex)

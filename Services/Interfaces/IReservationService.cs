@@ -14,5 +14,5 @@ public interface IReservationService
     Task<ReservationResponseDto> MarkNoShowAsync(int reservationId);
     Task<ReservationResponseDto> CompleteReservationAsync(int reservationId);
     Task<ReservationResponseDto> HandleWalkInAsync(int userId, CreateWalkInDto dto);
-    Task<bool> CancelReservationAsync(int reservationId, int userId);
+    Task<bool> CancelReservationAsync(int reservationId, int userId, bool isAdmin = false);
 }

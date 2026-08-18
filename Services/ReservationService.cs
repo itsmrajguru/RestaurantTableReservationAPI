@@ -332,7 +332,7 @@ public class ReservationService : IReservationService
         return MapToDto(createdReservation!);
     }
 
-    public async Task<bool> CancelReservationAsync(int reservationId, int userId)
+    public async Task<bool> CancelReservationAsync(int reservationId, int userId, bool isAdmin = false)
     {
         var reservation=await _reservationRepository.GetByIdAsync(reservationId);
         if(reservation==null)
@@ -340,7 +340,7 @@ public class ReservationService : IReservationService
             throw new ArgumentException("Reservation not found.");
         }
 
-        if(reservation.UserId!=userId)
+        if(!isAdmin && reservation.UserId!=userId)
         {
             throw new UnauthorizedAccessException("You are not authorized to cancel this reservation.");
         }
@@ -355,16 +355,19 @@ public class ReservationService : IReservationService
             throw new ArgumentException($"Cannot cancel a reservation in {reservation.Status} status.");
         }
 
-        // Check cancellation window
-        var config=await _configRepository.GetConfigurationAsync();
-        if(config!=null)
+        // Check cancellation window only if not an admin overriding
+        if(!isAdmin)
         {
-            var reservationDateTime=reservation.ReservationDate.ToDateTime(reservation.TimeSlot.StartTime);
-            var minCancelTime=reservationDateTime.AddHours(-config.CancellationWindowHours);
-
-            if(DateTime.Now>minCancelTime)
+            var config=await _configRepository.GetConfigurationAsync();
+            if(config!=null)
             {
-                throw new ArgumentException($"Reservations cannot be cancelled within {config.CancellationWindowHours} hours of the booking time.");
+                var reservationDateTime=reservation.ReservationDate.ToDateTime(reservation.TimeSlot.StartTime);
+                var minCancelTime=reservationDateTime.AddHours(-config.CancellationWindowHours);
+
+                if(DateTime.Now>minCancelTime)
+                {
+                    throw new ArgumentException($"Reservations cannot be cancelled within {config.CancellationWindowHours} hours of the booking time.");
+                }
             }
         }
 
