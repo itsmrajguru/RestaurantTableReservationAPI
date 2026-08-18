@@ -217,7 +217,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tableNumber\": \"T-{{$randomInt}}\",\n    \"capacity\": 4,\n    \"description\": \"Test table added via Postman runner\"\n}"
+							"raw": "{\n    \"tableNumber\": \"T-{{}}\",\n    \"capacity\": 4,\n    \"description\": \"Test table added via Postman runner\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/tables",
@@ -646,5 +646,3 @@
 		}
 	]
 }
-
-
