@@ -217,7 +217,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"tableNumber\": \"T-POSTMAN-01\",\n    \"capacity\": 4,\n    \"description\": \"Test table added via Postman runner\"\n}"
+							"raw": "{\n    \"tableNumber\": \"T-{{}}\",\n    \"capacity\": 4,\n    \"description\": \"Test table added via Postman runner\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/tables",
@@ -246,6 +246,22 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var offset = Math.floor(Math.random() * 20) + 11;",
+									"var date = new Date();",
+									"date.setDate(date.getDate() + offset);",
+									"var yyyy = date.getFullYear();",
+									"var mm = String(date.getMonth() + 1).padStart(2, '0');",
+									"var dd = String(date.getDate()).padStart(2, '0');",
+									"var dateStr = yyyy + '-' + mm + '-' + dd;",
+									"pm.environment.set('dynamicDate', dateStr);"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -268,7 +284,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2026-08-25\",\n    \"timeSlotId\": 7,\n    \"partySize\": 2,\n    \"notes\": \"Window seat preferred please!\"\n}"
+							"raw": "{\n    \"reservationDate\": \"{{dynamicDate}}\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6,\n    \"notes\": \"Window seat preferred please!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",
@@ -565,7 +581,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reservationDate\": \"2026-08-25\",\n    \"timeSlotId\": 7,\n    \"partySize\": 2,\n    \"notes\": \"Trying to book the same slot - should conflict!\"\n}"
+							"raw": "{\n    \"reservationDate\": \"{{dynamicDate}}\",\n    \"timeSlotId\": 1,\n    \"partySize\": 6,\n    \"notes\": \"Trying to book the same slot - should conflict!\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/reservations",

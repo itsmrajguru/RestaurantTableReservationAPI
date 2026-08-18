@@ -67,7 +67,7 @@ public class ReservationRepository : IReservationRepository
                 r.TableId == reservation.TableId && 
                 r.ReservationDate == reservation.ReservationDate && 
                 r.TimeSlotId == reservation.TimeSlotId &&
-                (r.Status == Models.Enums.ReservationStatus.Pending || r.Status == Models.Enums.ReservationStatus.Confirmed));
+                (r.Status == Models.Enums.ReservationStatus.Pending || r.Status == Models.Enums.ReservationStatus.Confirmed || r.Status == Models.Enums.ReservationStatus.CheckedIn));
 
             if (isBooked)
             {
@@ -108,6 +108,6 @@ public class ReservationRepository : IReservationRepository
             r.TableId == tableId &&
             r.ReservationDate == date &&
             r.TimeSlotId == timeSlotId &&
-            (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed));
+            (r.Status == ReservationStatus.Pending || r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn));
     }
 }
