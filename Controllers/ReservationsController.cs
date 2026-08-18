@@ -59,6 +59,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpGet("{id}")]
     [Authorize(Roles="Customer")]
     public async Task<IActionResult> GetReservationDetails(int id)
@@ -81,6 +82,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpPut("{id}/confirm")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> ConfirmReservation(int id)
@@ -89,6 +91,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpPut("{id}/check-in")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> CheckInReservation(int id)
@@ -97,6 +100,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpPut("{id}/no-show")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> MarkNoShow(int id)
@@ -105,6 +109,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpPut("{id}/complete")]
     [Authorize(Roles="Admin,Staff")]
     public async Task<IActionResult> CompleteReservation(int id)
@@ -127,6 +132,7 @@ public class ReservationsController : ControllerBase
         return Ok(result);
     }
 
+    /// <param name="id">1->Reservation 1, 2->Reservation 2, etc.</param>
     [HttpPut("{id}/cancel")]
     [Authorize(Roles="Customer,Admin,Staff")]
     public async Task<IActionResult> CancelReservation(int id)

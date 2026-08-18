@@ -23,6 +23,7 @@ public class OperatingHoursController : ControllerBase
         return Ok(hours);
     }
 
+    /// <param name="id">1->Sunday, 2->Monday, 3->Tuesday, 4->Wednesday, 5->Thursday, 6->Friday, 7->Saturday</param>
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetOperatingHoursById(int id)
@@ -41,6 +42,7 @@ public class OperatingHoursController : ControllerBase
         return Ok(hours);
     }
 
+    /// <param name="id">1->Sunday, 2->Monday, 3->Tuesday, 4->Wednesday, 5->Thursday, 6->Friday, 7->Saturday</param>
     [HttpPut("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> UpdateOperatingHours(int id, [FromBody] UpdateOperatingHoursDto updateDto)

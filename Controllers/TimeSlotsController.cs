@@ -29,6 +29,7 @@ public class TimeSlotsController : ControllerBase
         return Ok(slots);
     }
 
+    /// <param name="id">1->09:00-10:00, 2->10:00-11:00, etc.</param>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTimeSlotById(int id)
     {
@@ -53,6 +54,7 @@ public class TimeSlotsController : ControllerBase
         }
     }
 
+    /// <param name="id">1->09:00-10:00, 2->10:00-11:00, etc.</param>
     [HttpPut("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> UpdateTimeSlot(int id, UpdateTimeSlotDto dto)
@@ -69,6 +71,7 @@ public class TimeSlotsController : ControllerBase
         }
     }
 
+    /// <param name="id">1->09:00-10:00, 2->10:00-11:00, etc.</param>
     [HttpDelete("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> DeleteTimeSlot(int id)

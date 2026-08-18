@@ -31,6 +31,7 @@ public class TablesController : ControllerBase
         return Ok(tables);
     }
 
+    /// <param name="id">1->Table 1, 2->Table 2, etc.</param>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTableById(int id)
     {
@@ -48,6 +49,7 @@ public class TablesController : ControllerBase
         return CreatedAtAction(nameof(GetTableById), new{id=createdTable.Id}, createdTable);
     }
 
+    /// <param name="id">1->Table 1, 2->Table 2, etc.</param>
     [HttpPut("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> UpdateTable(int id, UpdateTableDto dto)
@@ -57,6 +59,7 @@ public class TablesController : ControllerBase
         return Ok(updatedTable);
     }
 
+    /// <param name="id">1->Table 1, 2->Table 2, etc.</param>
     [HttpDelete("{id}")]
     [Authorize(Roles="Admin")]
     public async Task<IActionResult> DeleteTable(int id)

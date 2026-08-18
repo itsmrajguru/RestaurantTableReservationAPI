@@ -101,6 +101,10 @@ builder.Services.AddSwaggerGen(options =>
     // Add our custom operation filter to show roles in Swagger UI
     options.OperationFilter<SwaggerRoleOperationFilter>();
 
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
