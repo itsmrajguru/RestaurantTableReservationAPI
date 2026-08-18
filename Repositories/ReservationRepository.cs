@@ -57,6 +57,36 @@ public class ReservationRepository : IReservationRepository
             .ToListAsync();
     }
 
+    public async Task<Reservation> CreateReservationWithConcurrencyCheckAsync(Reservation reservation)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+        try
+        {
+            // 1. Double check if booked inside the transaction lock
+            var isBooked = await _context.Reservations.AnyAsync(r => 
+                r.TableId == reservation.TableId && 
+                r.ReservationDate == reservation.ReservationDate && 
+                r.TimeSlotId == reservation.TimeSlotId &&
+                (r.Status == Models.Enums.ReservationStatus.Pending || r.Status == Models.Enums.ReservationStatus.Confirmed));
+
+            if (isBooked)
+            {
+                throw new InvalidOperationException("DOUBLE_BOOKING_CONFLICT");
+            }
+
+            await _context.Reservations.AddAsync(reservation);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return reservation;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
     public async Task AddAsync(Reservation reservation)
     {
         await _context.Reservations.AddAsync(reservation);

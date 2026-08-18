@@ -36,6 +36,10 @@ public class ReservationsController : ControllerBase
         {
             return BadRequest(new{message=ex.Message});
         }
+        catch(InvalidOperationException ex)
+        {
+            return Conflict(new{message=ex.Message});
+        }
     }
 
     [HttpGet("my")]

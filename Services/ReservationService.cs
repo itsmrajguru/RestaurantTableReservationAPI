@@ -113,7 +113,14 @@ public class ReservationService : IReservationService
             CreatedAt=DateTime.UtcNow
         };
 
-        await _reservationRepository.AddAsync(reservation);
+        try
+        {
+            await _reservationRepository.CreateReservationWithConcurrencyCheckAsync(reservation);
+        }
+        catch (InvalidOperationException ex) when (ex.Message == "DOUBLE_BOOKING_CONFLICT")
+        {
+            throw new InvalidOperationException("Sorry, this table was just booked by someone else. Please try another time slot.");
+        }
 
         // Fetch it again to get navigation properties for the DTO
         var createdReservation=await _reservationRepository.GetByIdAsync(reservation.Id);
