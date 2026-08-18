@@ -6,5 +6,6 @@ public interface IOperatingHoursService
 {
     Task<List<OperatingHoursResponseDto>> GetAllOperatingHoursAsync();
     Task<OperatingHoursResponseDto?> GetOperatingHoursByIdAsync(int id);
+    Task<OperatingHoursResponseDto?> GetOperatingHoursByDayAsync(DayOfWeek day);
     Task<OperatingHoursResponseDto?> UpdateOperatingHoursAsync(int id, UpdateOperatingHoursDto updateDto);
 }

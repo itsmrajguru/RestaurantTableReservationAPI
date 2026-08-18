@@ -29,11 +29,22 @@ public class OperatingHoursService : IOperatingHoursService
         return _mapper.Map<OperatingHoursResponseDto>(hours);
     }
 
+    public async Task<OperatingHoursResponseDto?> GetOperatingHoursByDayAsync(DayOfWeek day)
+    {
+        var hours = await _operatingHoursRepository.GetByDayAsync(day);
+        if(hours==null) return null;
+        return _mapper.Map<OperatingHoursResponseDto>(hours);
+    }
+
     public async Task<OperatingHoursResponseDto?> UpdateOperatingHoursAsync(int id, UpdateOperatingHoursDto updateDto)
     {
+        //1. check the existing data
         var hours=await _operatingHoursRepository.GetByIdAsync(id);
         if(hours==null) return null;
 
+        //2. validating opening and closing time
+        /* We are cheking whether the Because restaurant is open ,if open,
+         we need to make sure opening and closing times are valid. */
         if(!updateDto.IsClosed)
         {
             if(string.IsNullOrEmpty(updateDto.OpeningTime) || string.IsNullOrEmpty(updateDto.ClosingTime))

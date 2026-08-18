@@ -10,7 +10,6 @@ namespace RestaurantTableReservationAPI.Controllers;
 public class OperatingHoursController : ControllerBase
 {
     private readonly IOperatingHoursService _operatingHoursService;
-
     public OperatingHoursController(IOperatingHoursService operatingHoursService)
     {
         _operatingHoursService=operatingHoursService;
@@ -30,6 +29,15 @@ public class OperatingHoursController : ControllerBase
     {
         var hours=await _operatingHoursService.GetOperatingHoursByIdAsync(id);
         if(hours==null) return NotFound(new{message="Operating hours not found."});
+        return Ok(hours);
+    }
+
+    [HttpGet("day/{day}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOperatingHoursByDay(DayOfWeek day)
+    {
+        var hours = await _operatingHoursService.GetOperatingHoursByDayAsync(day);
+        if(hours == null) return NotFound(new{message="Operating hours not found for this day."});
         return Ok(hours);
     }
 

@@ -16,11 +16,15 @@ public class RestaurantConfigRepository : IRestaurantConfigRepository
 
     public async Task<RestaurantConfiguration?> GetConfigurationAsync()
     {
+        /* this means that simply look into database for RestaurantConfigurations table
+        and return the data from it  */
         return await _context.RestaurantConfigurations.FirstOrDefaultAsync();
     }
 
     public async Task UpdateConfigurationAsync(RestaurantConfiguration config)
     {
+        /* This means that simply take the new config and update into the table
+        RestaurantConfigurations of the database and later save it */
         _context.RestaurantConfigurations.Update(config);
         await _context.SaveChangesAsync();
     }
