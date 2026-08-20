@@ -77,14 +77,14 @@ public class ReservationService : IReservationService
             .Where(t=>t.Capacity>=dto.PartySize)
             .OrderBy(t=>t.Capacity)
             .ToList();
-
+            
         if(!capableTables.Any())
         {
             throw new InvalidOperationException($"No tables available that can accommodate a party of {dto.PartySize}.");
         }
 
+        //this is the actualy assigned table
         RestaurantTable? assignedTable=null;
-        
         foreach(var table in capableTables)
         {
             bool isBooked=await _reservationRepository.IsTableBookedAsync(table.Id, dto.ReservationDate, dto.TimeSlotId);
@@ -125,7 +125,8 @@ public class ReservationService : IReservationService
         // Fetch it again to get navigation properties for the DTO
         var createdReservation=await _reservationRepository.GetByIdAsync(reservation.Id);
 
-        return MapToDto(createdReservation!);
+        return MapToDto(createdReservation!); 
+        // this ! says -->that this object can never be null
     }
 
     public async Task<List<ReservationResponseDto>> GetCustomerUpcomingReservationsAsync(int userId)

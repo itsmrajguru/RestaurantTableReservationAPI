@@ -4,6 +4,10 @@ using RestaurantTableReservationAPI.DTOs;
 
 /* this file is only made to execute the automapper
 so that we dont need to manually copy the model fields into dto fields*/
+
+/* And how it works ?
+--->  So simply the automaper takes the data from the existing entity and fields are there in the
+ new then match the fields and copy the data from the existing to the new one*/
 namespace RestaurantTableReservationAPI.Mappings;
 
 public class MappingProfile : Profile
@@ -21,6 +25,9 @@ public class MappingProfile : Profile
         CreateMap<UpdateTimeSlotDto, TimeSlot>();
 
         // Reservation Mappings
+        /* But here the full names dont exists That's why we write individual logic for every field and
+         transfer the data from the existing to new one */
+
         // We use ForMember to flatten nested objects (e.g. mapping r.User.Name to dto.UserName)
         CreateMap<Reservation, ReservationResponseDto>()
             .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.User.Name))
@@ -30,6 +37,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.EndTime, opt => opt.MapFrom(src => src.TimeSlot.EndTime))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
+        /* Ignore means-->let the user cant pass any data,databse will set it , by its own*/
         CreateMap<CreateReservationDto, Reservation>()
             .ForMember(dest => dest.Status, opt => opt.Ignore()) // Don't allow user to set status
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())

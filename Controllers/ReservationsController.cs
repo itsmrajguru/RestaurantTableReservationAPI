@@ -21,9 +21,15 @@ public class ReservationsController : ControllerBase
     [Authorize] // Both Customers and Admins can create reservations
     public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
     {
+        /* here,User is the object that stores entire info of the user
+        with the help of token saving enocded info */
+
+        /* we've authorize method to check user type, but here
+        the method .FindFirstUser()checks the actual userID through the token*/
         var userIdString=User.FindFirstValue(ClaimTypes.NameIdentifier);
         if(string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
         {
+            /* !int.TryParse(userIdString, out int userId) -->returns both bool and int values */
             throw new UnauthorizedAccessException("Invalid user token.");
         }
 

@@ -22,25 +22,25 @@ public class ReservationValidationEngine : IReservationValidationEngine
         var requestedDateTime=date.ToDateTime(time);
         var now=DateTime.Now;
 
-        // Rule 1: Past Date Check
+        // Rule 1: check whether the requested time is after the current time ?
         if(requestedDateTime<now)
         {
             return ReservationValidationResult.Failure("Reservations cannot be made in the past.");
         }
 
-        // Rule 2: Minimum Notice (1 hour)
+        // Rule 2: Reservations must be made before, what time ?
         if(requestedDateTime<now.AddHours(1))
         {
             return ReservationValidationResult.Failure("Reservations must be made at least 1 hour in advance.");
         }
 
-        // Rule 3: Advance Booking Check
+        // Rule 3: Reservations can only be done , how many days before?
         if(requestedDateTime>now.AddDays(config.AdvanceBookingDays))
         {
             return ReservationValidationResult.Failure($"Reservations can only be made up to {config.AdvanceBookingDays} days in advance.");
         }
 
-        // Rule 4: Party Size Check
+        // Rule 4: How many maxPartysize can be allowed ?
         if(partySize>config.MaxPartySize)
         {
             return ReservationValidationResult.Failure($"Requested party size ({partySize}) exceeds the restaurant's maximum allowed party size of {config.MaxPartySize}.");
@@ -64,19 +64,19 @@ public class ReservationValidationEngine : IReservationValidationEngine
 
         var today=DateOnly.FromDateTime(DateTime.Now);
 
-        // Rule 1: Past Date Check
+        // Rule 1: check whether the requested date is before current date?
         if(date<today)
         {
             return ReservationValidationResult.Failure("Reservations cannot be made in the past.");
         }
 
-        // Rule 3: Advance Booking Check
+        // Rule 3: In how many advance days,the reservations can be done?
         if(date>today.AddDays(config.AdvanceBookingDays))
         {
             return ReservationValidationResult.Failure($"Reservations can only be made up to {config.AdvanceBookingDays} days in advance.");
         }
 
-        // Rule 4: Party Size Check
+        // Rule 4: How many maxPartysize can be allowed ?
         if(partySize>config.MaxPartySize)
         {
             return ReservationValidationResult.Failure($"Requested party size ({partySize}) exceeds the restaurant's maximum allowed party size of {config.MaxPartySize}.");

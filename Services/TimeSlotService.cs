@@ -70,7 +70,7 @@ public class TimeSlotService : ITimeSlotService
         var slot=await _timeSlotRepository.GetByIdAsync(id, true);
         if(slot==null) return false;
 
-        slot.IsActive=false;
+        slot.IsActive=false; //soft delete
         await _timeSlotRepository.UpdateAsync(slot);
         return true;
     }
@@ -85,6 +85,7 @@ public class TimeSlotService : ITimeSlotService
             throw new ArgumentException("The restaurant has no open days configured. Cannot create time slots.");
         }
 
+        
         // The slot must fit within the opening and closing times of at least ONE open day
         bool fitsAnyDay=openDays.Any(day => startTime>=day.OpeningTime!.Value && endTime<=day.ClosingTime!.Value);
 

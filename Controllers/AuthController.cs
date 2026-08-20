@@ -6,8 +6,14 @@ namespace RestaurantTableReservationAPI.Controllers;
 
 
 [Route("api/[controller]")]
-/*this api controller automatically returns 400 responses
-and also helps for validation*/
+    /* here, the keywword, controller automatically replaces class name ,to 
+    design a URL, like api/authController */
+
+    /*this api controller automatically returns 400 responses
+    and also helps for validation as well as JSON Parsing
+
+    and provides helper methods like OK(),NotFound(),Unauthorised()*/
+
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -15,8 +21,8 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     /*Here the authController is simply asking the .NET Core
     that which class executes the IAuthService
-    then the .NET DI returns the authService 
-    and thus authService is used as _authService*/
+    and .NET DI returns the authService which is used as _authService
+    throughtout the controller*/
     public AuthController(IAuthService authService)
     {
         _authService=authService;
@@ -26,8 +32,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
     /*Here Task->represents a thread to be completed
-    and IActionResult -> represents the result to be returned
-    when the code is executed then it returns the result
+    and IActionResult -> represents the result to be returned.
     if the login is successful then it returns the result
     if the login fails then it returns the error message
     */

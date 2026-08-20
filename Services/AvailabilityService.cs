@@ -42,26 +42,32 @@ public class AvailabilityService : IAvailabilityService
         }
 
         // 2. Check Operating Hours for the specific day
+        /* 2a. Get all operating hours records, then find the one matching
+the requested date's day of week (e.g. if date is a Monday, find Monday's record)*/ 
         var operatingHoursList=await _operatingHoursRepository.GetAllAsync();
         var dayHours=operatingHoursList.FirstOrDefault(h=>h.DayOfWeek==date.DayOfWeek);
 
         if(dayHours==null || dayHours.IsClosed || !dayHours.OpeningTime.HasValue || !dayHours.ClosingTime.HasValue)
         {
-            return response; // Closed this day
+            return response; //it will return [](empty box-->that means no slot available)
         }
 
-        // 3. Filter Time Slots
+        // 3. get all Time Slots of the requested date
         var allTimeSlots=await _timeSlotRepository.GetAllAsync();
         var validTimeSlots=allTimeSlots.Where(ts => 
             ts.StartTime >= dayHours.OpeningTime.Value && 
             ts.EndTime <= dayHours.ClosingTime.Value
         ).ToList();
 
-        // 3b. If date is today, filter out past time slots (with 1-hour minimum notice)
+        /* 3b. If date is today,
+         filter out past time slots (with 1-hour minimum notice)*/
         if(date==DateOnly.FromDateTime(DateTime.Now))
         {
             var now=TimeOnly.FromDateTime(DateTime.Now);
             var minNoticeTime=now.AddHours(1);
+
+            //this means,return the only valid slots, whose timing is after the minNoticeTime
+             
             validTimeSlots=validTimeSlots.Where(ts=>ts.StartTime >= minNoticeTime).ToList();
         }
 
